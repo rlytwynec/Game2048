@@ -1,6 +1,7 @@
 package com.example.riley.game2048;
 
 import android.util.Log;
+import android.view.View;
 
 /**
  * Project  :   Game2048 - Puzzle Game
@@ -14,7 +15,7 @@ import android.util.Log;
  *              move(int)   - accepts direction as input and updates board accordingly
  * Created by Riley on 4/21/2015.
  */
-public class GameHandler {
+public class GameHandler{
     private static final String DEBUG_TAG = "board";    //debug tag for logs
     private static int[][] board = new int[4][4];       //contains the game board
     private static boolean validMove;                   //true if a move is valid(moves tiles)
@@ -33,6 +34,7 @@ public class GameHandler {
         addTile(2);                     //add tile of value 2 to random location
         addTile(2);                     //add tile of value 2 to random location
         drawBoard();                    //draw the board
+        draw();
     }
 
 
@@ -45,6 +47,7 @@ public class GameHandler {
     public static void move(int dir){
         int loopCount;                          //counter for while loop (sets maximum)
         validMove = false;                      //true if move is valid (results in moved tiles)
+
         switch(dir){                            //switch for handling each direction
             case 0  :                           //case 0: UP
                 for(int x = 0; x < 4; x++){     //scan left to right
@@ -56,10 +59,10 @@ public class GameHandler {
                                     if(board[x][(w + 1)] != 0 && board[x][w] == 0)
                                         validMove = true; //true if nonzero value is moved
                                     board[x][w] = board[x][(w + 1)];
-                                    //drawBoard();
+                                    draw();
                                 }
                                 board[x][3] = 0;//insert zero at top
-                                //drawBoard();
+                                draw();
                                 loopCount++;
                             }
                         }
@@ -69,7 +72,7 @@ public class GameHandler {
                             validMove = true;   //move is valid if two matching tiles collide
                             for(int w = y; w < 3; w++) {    //combines pair & slides other tiles up
                                 board[x][w] = board[x][(w + 1)];
-                                //drawBoard();
+                                draw();
                             }
                             board[x][3] = 0;   //sets bottom tile in column to zero
                             board[x][y] = board[x][y] * 2; //doubles tile
@@ -88,10 +91,10 @@ public class GameHandler {
                                     if(board[(w - 1)][y] != 0 && board[w][y] == 0)
                                         validMove = true;
                                     board[w][y] = board[(w - 1)][y];
-                                    //drawBoard();
+                                    draw();
                                 }
                                 board[0][y] = 0;
-                                //drawBoard();
+                                draw();
                                 loopCount++;
                             }
                         }
@@ -101,7 +104,7 @@ public class GameHandler {
                             validMove = true;
                             for(int w = x; w > 0; w--) {
                                 board[w][y] = board[(w - 1)][y];
-                                //drawBoard();
+                                draw();
                             }
                             board[0][y] = 0;
                             board[x][y] = board[x][y] * 2;
@@ -121,10 +124,10 @@ public class GameHandler {
                                         validMove = true;
                                     }
                                     board[x][w] = board[x][(w - 1)];
-                                    //drawBoard();
+                                    draw();
                                 }
                                 board[x][0] = 0;
-                                //drawBoard();
+                                draw();
                                 loopCount++;
                             }
                         }
@@ -134,7 +137,7 @@ public class GameHandler {
                             validMove = true;
                             for(int w = y; w > 0; w--) {
                                 board[x][w] = board[x][(w - 1)];
-                                //drawBoard();
+                                draw();
                             }
                             board[x][0] = 0;
                             board[x][y] = board[x][y] * 2;
@@ -154,10 +157,10 @@ public class GameHandler {
                                         validMove = true;
                                     }
                                     board[w][y] = board[(w + 1)][y];
-                                    //drawBoard();
+                                    draw();
                                 }
                                 board[3][y] = 0;
-                                //drawBoard();
+                                draw();
                                 loopCount++;
                             }
                         }
@@ -167,7 +170,7 @@ public class GameHandler {
                             validMove = true;
                             for(int w = x; w < 3; w++) {
                                 board[w][y] = board[(w + 1)][y];
-                                //drawBoard();
+                                draw();
                             }
                             board[3][y] = 0;
                             board[x][y] = board[x][y] * 2;
@@ -179,6 +182,7 @@ public class GameHandler {
         if(validMove)       //if the move was valid (tiles moved or pair made)
             addTile(2);     //add new tile in random empty space
         drawBoard();
+        draw();
     }
 
 
@@ -248,34 +252,6 @@ public class GameHandler {
 
 
     /**
-     * Method       :   getBoardSum
-     * Function     :   Totals the value of all tiles on the board. Used as checksum for testing.
-     * Parameters   :   None
-     * Returns      :   @return sum - integer sum of all tiles on board
-     */
-    public static int getBoardSum(){
-        int sum = 0;
-        for(int x = 0; x < 4; x++){
-            for(int y = 0; y < 4; y++){
-                sum += board[x][y];
-            }
-        }
-        return sum;
-    }
-
-
-    /**
-     * Method       :   getValid()
-     * Function     :   Returns true if move is valid, false otherwise. Used for automated testing.
-     * Parameters   :   None
-     * Returns      :   @return validMove - true if move is valid
-     */
-    public static boolean getValid() {
-        return validMove;
-    }
-
-
-    /**
      * Method       :   getBoard()
      * Function     :   Returns board array
      * Parameters   :   None
@@ -283,5 +259,12 @@ public class GameHandler {
      */
     public static int[][] getBoard(){
         return board;
+    }
+
+
+    public static void draw(){
+        MainActivity.customCanvas.postInvalidate();
+        MainActivity.draw();
+        Log.d("board", "DRAW REQUEST SENT");
     }
 }
