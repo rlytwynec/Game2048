@@ -19,6 +19,8 @@ public class GameHandler{
     private static final String DEBUG_TAG = "board";    //debug tag for logs
     private static int[][] board = new int[4][4];       //contains the game board
     private static boolean validMove;                   //true if a move is valid(moves tiles)
+    private static int score;
+    private static int highScore = 0;
 
 
     /**
@@ -31,8 +33,10 @@ public class GameHandler{
         for(int x = 0; x < 4; x++)      //increment through columns
             for(int y = 0; y < 4; y++)  //increment through rows
                 board[x][y] = 0;        //set value to 0
-        addTile(2);                     //add tile of value 2 to random location
-        addTile(2);                     //add tile of value 2 to random location
+        score = 0;
+
+        addTile();                     //add tile of value 2 to random location
+        addTile();                     //add tile of value 2 to random location
         drawBoard();                    //draw the board
         draw();
     }
@@ -59,25 +63,27 @@ public class GameHandler{
                                     if(board[x][(w + 1)] != 0 && board[x][w] == 0)
                                         validMove = true; //true if nonzero value is moved
                                     board[x][w] = board[x][(w + 1)];
-                                    draw();
+
                                 }
                                 board[x][3] = 0;//insert zero at top
-                                draw();
+
                                 loopCount++;
                             }
                         }
                     }
+
                     for(int y = 0; y < 3; y++){ //second scan checks for pairs of same number
                         if(board[x][y] == board[x][(y + 1)] && board[x][y] != 0){
                             validMove = true;   //move is valid if two matching tiles collide
                             for(int w = y; w < 3; w++) {    //combines pair & slides other tiles up
                                 board[x][w] = board[x][(w + 1)];
-                                draw();
                             }
                             board[x][3] = 0;   //sets bottom tile in column to zero
                             board[x][y] = board[x][y] * 2; //doubles tile
+                            score += board[x][y];
                         }
                     }
+                    draw();
                 }
                 break;
 
@@ -91,25 +97,28 @@ public class GameHandler{
                                     if(board[(w - 1)][y] != 0 && board[w][y] == 0)
                                         validMove = true;
                                     board[w][y] = board[(w - 1)][y];
-                                    draw();
+
                                 }
                                 board[0][y] = 0;
-                                draw();
+
                                 loopCount++;
                             }
                         }
                     }
+
                     for(int x = 3; x > 0; x--){ //second R-L scan checks for pairs
                         if(board[x][y] == board[(x - 1)][y] && board[x][y] != 0){
                             validMove = true;
                             for(int w = x; w > 0; w--) {
                                 board[w][y] = board[(w - 1)][y];
-                                draw();
+
                             }
                             board[0][y] = 0;
                             board[x][y] = board[x][y] * 2;
+                            score += board[x][y];
                         }
                     }
+                    draw();
                 }
                 break;
 
@@ -124,25 +133,28 @@ public class GameHandler{
                                         validMove = true;
                                     }
                                     board[x][w] = board[x][(w - 1)];
-                                    draw();
+
                                 }
                                 board[x][0] = 0;
-                                draw();
+
                                 loopCount++;
                             }
                         }
                     }
+
                     for(int y = 3; y > 0; y--){ //second scan checks for adjacent nonzero pairs
                         if(board[x][y] == board[x][(y - 1)] && board[x][y] != 0){
                             validMove = true;
                             for(int w = y; w > 0; w--) {
                                 board[x][w] = board[x][(w - 1)];
-                                draw();
+
                             }
                             board[x][0] = 0;
                             board[x][y] = board[x][y] * 2;
+                            score += board[x][y];
                         }
                     }
+                    draw();
                 }
                 break;
 
@@ -157,30 +169,36 @@ public class GameHandler{
                                         validMove = true;
                                     }
                                     board[w][y] = board[(w + 1)][y];
-                                    draw();
+
                                 }
                                 board[3][y] = 0;
-                                draw();
+
                                 loopCount++;
                             }
                         }
                     }
+
                     for(int x = 0; x < 3; x++){ //second scan checks for pairs
                         if(board[x][y] == board[(x + 1)][y] && board[x][y] != 0){
                             validMove = true;
                             for(int w = x; w < 3; w++) {
                                 board[w][y] = board[(w + 1)][y];
-                                draw();
+
                             }
                             board[3][y] = 0;
                             board[x][y] = board[x][y] * 2;
+                            score += board[x][y];
                         }
                     }
+                    draw();
                 }
                 break;
         }
         if(validMove)       //if the move was valid (tiles moved or pair made)
-            addTile(2);     //add new tile in random empty space
+            addTile();     //add new tile in random empty space
+        if(score > highScore){
+            highScore = score;
+        }
         drawBoard();
         draw();
     }
@@ -192,12 +210,17 @@ public class GameHandler{
      * Parameters   :   @param val - integer value to be added (2 or 4)
      * Returns      :   void
      */
-    private static void addTile(int val){
+    private static void addTile(){
+        int val;
         int[] empty = new int[16];  //holds the integer values of empty spaces (left-right, top-bot)
         int countCells = 0;         //tracks current cell number during scan
         int countZeros = 0;         //tracks amount of empty cells on board
         int selectCell;             //randomly selected cell
 
+        if(Math.random() > 0.9)
+            val = 4;
+        else
+            val = 2;
         for(int y = 0; y < 4; y++)      //scan rows top to bottom
             for(int x = 0; x < 4; x++)  //scan columns left to right
             {
@@ -251,6 +274,21 @@ public class GameHandler{
     }
 
 
+    public static void setBoard(int[][] b){
+        board = b;
+    }
+
+
+    public static void setScore(int s){
+        score = s;
+    }
+
+
+    public static void setHighScore(int h){
+        highScore = h;
+    }
+
+
     /**
      * Method       :   getBoard()
      * Function     :   Returns board array
@@ -262,9 +300,14 @@ public class GameHandler{
     }
 
 
+    public static int getScore() { return score; }
+
+
+    public static int getHighScore() { return highScore; }
+
+
     public static void draw(){
-        MainActivity.customCanvas.postInvalidate();
-        MainActivity.draw();
+        MainActivity.customCanvas.invalidate();
         Log.d("board", "DRAW REQUEST SENT");
     }
 }

@@ -1,5 +1,7 @@
 package com.example.riley.game2048;
 
+
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,7 +9,10 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.widget.TextView;
-import android.view.View;
+
+import org.w3c.dom.Text;
+
+import java.util.StringTokenizer;
 
 
 /**
@@ -27,20 +32,49 @@ import android.view.View;
  */
 public class MainActivity extends ActionBarActivity {
     private final String DEBUG_TAG = "motion";
-    private final int thresh = 4;
+    private final int thresh = 10;
     private float x1, x2, y1, y2;
     public static CanvasView customCanvas;
+    private SharedPreferences preferenceSettings;
+    private SharedPreferences.Editor preferenceEditor;
+    private static final int PREFERENCE_MODE_PRIVATE = 0;
+    
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         customCanvas = (CanvasView) findViewById(R.id.signature_canvas);
-        GameHandler.setBoard();
+        preferenceSettings = getPreferences(PREFERENCE_MODE_PRIVATE);
+        preferenceEditor = preferenceSettings.edit();
+
+
+
+        if (preferenceSettings.getInt("high", -1) > 0)
+        {
+            GameHandler.setHighScore(preferenceSettings.getInt("high", -1));
+            GameHandler.setScore(preferenceSettings.getInt("score", -1));
+            GameHandler.setBoard(decodeBoard(preferenceSettings.getString("board", "0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0")));
+            GameHandler.draw();
+        }
+        else
+            GameHandler.setBoard();
+
+        updateScore(GameHandler.getScore(), GameHandler.getHighScore());
         x1 = 0;
         y1 = 0;
+
+    }
+
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        preferenceEditor.putInt("high", GameHandler.getHighScore());
+        preferenceEditor.putInt("score", GameHandler.getScore());
+        preferenceEditor.putString("board", encodeBoard(GameHandler.getBoard()));
+        preferenceEditor.commit();
     }
 
 
@@ -63,6 +97,7 @@ public class MainActivity extends ActionBarActivity {
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset) {
             GameHandler.setBoard();
+            updateScore(GameHandler.getScore(), GameHandler.getHighScore());
             return true;
         }
 
@@ -84,6 +119,7 @@ public class MainActivity extends ActionBarActivity {
                 x2 = event.getX();
                 Log.d(DEBUG_TAG, "Dir: " + calcDirection(x1, y1, x2, y2));
                 GameHandler.move(calcDirection(x1, y1, x2, y2));
+                updateScore(GameHandler.getScore(), GameHandler.getHighScore());
                 break;
         }
         return true;
@@ -113,9 +149,31 @@ public class MainActivity extends ActionBarActivity {
         return dir;
     }
 
+    private void updateScore(int s, int h){
+        TextView score;
+        TextView high;
+        score = (TextView) findViewById(R.id.score);
+        high = (TextView) findViewById(R.id.high);
+        score.setText("Score:\n" + s);
+        high.setText("High Score:\n" + h);
+    }
 
-    public static void draw(){
-        //customCanvas.invalidate();
-        //Log.d("board", "DRAW REQUEST");
+
+    private String encodeBoard(int[][] b){
+        String s = "";
+        for(int x = 0; x < 4; x++)
+            for(int y = 0; y < 4; y++)
+                s += b[x][y] + ",";
+        return s;
+    }
+
+
+    private int[][] decodeBoard(String s){
+        int[][] b = new int[4][4];
+        StringTokenizer st = new StringTokenizer(s, ",");
+        for(int x = 0; x < 4; x++)
+            for(int y = 0; y < 4; y++)
+                b[x][y] = Integer.parseInt(st.nextToken());
+        return b;
     }
 }

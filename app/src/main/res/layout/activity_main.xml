@@ -11,5 +11,25 @@
         android:id="@+id/signature_canvas"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textColor="#FFFFFF" />
+        android:textColor="#FFFFFF"
+        android:background="#CBCCC5"
+        android:layout_gravity="top"/>
+
+    <TextView android:id="@+id/score"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="left|bottom"
+        android:layout_marginBottom="100dp"
+        android:layout_marginLeft="20dp"
+        android:textSize="28dp"
+        android:text="Score:"/>
+
+    <TextView android:id="@+id/high"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|bottom"
+        android:layout_marginBottom="100dp"
+        android:layout_marginRight="20dp"
+        android:textSize="28dp"
+        android:text="High Score:"/>
 </FrameLayout>
