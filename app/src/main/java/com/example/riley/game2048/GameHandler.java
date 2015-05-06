@@ -29,7 +29,7 @@ public class GameHandler{
      * Parameters   :   None
      * Returns      :   void
      */
-    public static void setBoard(){
+    public static void resetBoard(){
         for(int x = 0; x < 4; x++)      //increment through columns
             for(int y = 0; y < 4; y++)  //increment through rows
                 board[x][y] = 0;        //set value to 0

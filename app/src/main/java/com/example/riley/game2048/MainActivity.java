@@ -1,6 +1,8 @@
 package com.example.riley.game2048;
 
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -59,7 +61,7 @@ public class MainActivity extends ActionBarActivity {
             GameHandler.draw();
         }
         else
-            GameHandler.setBoard();
+            GameHandler.resetBoard();
 
         updateScore(GameHandler.getScore(), GameHandler.getHighScore());
         x1 = 0;
@@ -96,7 +98,7 @@ public class MainActivity extends ActionBarActivity {
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_reset) {
-            GameHandler.setBoard();
+            GameHandler.resetBoard();
             updateScore(GameHandler.getScore(), GameHandler.getHighScore());
             return true;
         }
@@ -120,6 +122,9 @@ public class MainActivity extends ActionBarActivity {
                 Log.d(DEBUG_TAG, "Dir: " + calcDirection(x1, y1, x2, y2));
                 GameHandler.move(calcDirection(x1, y1, x2, y2));
                 updateScore(GameHandler.getScore(), GameHandler.getHighScore());
+                if(GameHandler.isGameOver()){
+                    showGameOver();
+                }
                 break;
         }
         return true;
@@ -175,5 +180,25 @@ public class MainActivity extends ActionBarActivity {
             for(int y = 0; y < 4; y++)
                 b[x][y] = Integer.parseInt(st.nextToken());
         return b;
+    }
+
+
+    private void showGameOver() {
+
+        AlertDialog.Builder helpBuilder = new AlertDialog.Builder(this);
+        helpBuilder.setTitle("Game Over");
+        helpBuilder.setMessage("There are no available moves left");
+        helpBuilder.setPositiveButton("Reset",
+                new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int which) {
+                        GameHandler.resetBoard();
+                        updateScore(0, GameHandler.getHighScore());
+                    }
+                });
+
+        // Remember, create doesn't show the dialog
+        AlertDialog helpDialog = helpBuilder.create();
+        helpDialog.show();
     }
 }
